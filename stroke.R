@@ -6,10 +6,9 @@ library(caret)
 library(randomForest)
 
 
+# loading data
 
 data = read.csv("C:/Users/30694/Desktop/healthcare-dataset-stroke-data/healthcare-dataset-stroke-data.csv", na = "N/A")
-
-
 
 
 #first, we check data structure
@@ -22,7 +21,6 @@ str(data)
 
 data$hypertension = as.factor(data$hypertension)
 data$heart_disease = as.factor(data$heart_disease)
-
 
 
 #we check if our categorical variables have values that don;t affect our prediction 
@@ -109,8 +107,6 @@ g2 = ggplot(data, aes(y = age, x = as.factor(stroke) ,fill = as.factor(stroke)))
 grid.arrange(g1 , g2)
 
 
-
-
 # Hypertension
 
 data %>% 
@@ -124,7 +120,6 @@ data %>%
 data %>% 
   group_by(heart_disease) %>% 
   summarise(Count = n(), "Percentage of Strokes" = round(mean(stroke), 3))
-
 
 
 # Ever Married
