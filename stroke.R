@@ -16,7 +16,6 @@ data = read.csv("C:/Users/30694/Desktop/healthcare-dataset-stroke-data/healthcar
 str(data)
 
 
-
 # converting columns $hypertension, $heart_disease and $stroke from numeric to factor
 
 data$hypertension = as.factor(data$hypertension)
@@ -24,7 +23,6 @@ data$heart_disease = as.factor(data$heart_disease)
 
 
 #we check if our categorical variables have values that don;t affect our prediction 
-
 
 data %>% 
   group_by(gender) %>%
@@ -83,7 +81,7 @@ data = data %>%
 (data[data$stroke ==1,] %>% nrow() / length(data$stroke)) %>% round(3) %>% paste0("%")
  
 
-# we examine the relationship between stroke and every variable of our dataset. 
+## We examine the relationship between stroke and every variable of our dataset. 
  
 # Gender
  
