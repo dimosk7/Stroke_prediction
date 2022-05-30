@@ -5,22 +5,18 @@ library(gridExtra)
 library(caret)
 library(randomForest)
 
-
 # loading data
 
 data = read.csv("C:/Users/30694/Desktop/healthcare-dataset-stroke-data/healthcare-dataset-stroke-data.csv", na = "N/A")
-
 
 #first, we check data structure
 
 str(data)
 
-
 # converting columns $hypertension, $heart_disease and $stroke from numeric to factor
 
 data$hypertension = as.factor(data$hypertension)
 data$heart_disease = as.factor(data$heart_disease)
-
 
 #we check if our categorical variables have values that don;t affect our prediction 
 
@@ -40,22 +36,17 @@ data %>%
   group_by(Residence_type) %>%
   summarise(count = n())
 
-
 # we delete recordings whose gender is "Other"
 
 data = data[!(data$gender == "Other"),]
 
-
-
 ## Missing values
-
 
 #we check for NAs in every column
 
 na = data %>% sapply(function(x) is.na(x) %>% sum())
 names(na) = colnames(data)
 na
-
 
 #we want to see if these NAs are related to strokes
 
@@ -72,8 +63,6 @@ na
 data = data %>% 
    mutate(bmi_na = case_when(is.na(bmi) ~ 'BMI - NA' , !is.na(bmi) ~ 'BMI - Value'))
 
-
-
 ## Data Description
  
 #  we observe that 4.9% of our records have "stroke" attribute 
@@ -89,8 +78,6 @@ data %>%
    group_by(gender) %>%
    summarise(Count = n(), "Percentage of Strokes" = round(mean(stroke), 3))
 
-
-
 # Age
 
 g1 = ggplot(data, aes(x = age, fill = as.factor(stroke))) +
@@ -104,14 +91,11 @@ g2 = ggplot(data, aes(y = age, x = as.factor(stroke) ,fill = as.factor(stroke)))
 
 grid.arrange(g1 , g2)
 
-
 # Hypertension
 
 data %>% 
   group_by(hypertension) %>% 
   summarise(Count = n(), "Percentage of Strokes" = round(mean(stroke), 3))
-
-
 
 # Heart Disease
 
@@ -119,30 +103,24 @@ data %>%
   group_by(heart_disease) %>% 
   summarise(Count = n(), "Percentage of Strokes" = round(mean(stroke), 3))
 
-
 # Ever Married
 
 data %>% 
   group_by(ever_married) %>% 
   summarise(Count = n(), "Percentage of Strokes" = round(mean(stroke), 3))
   
-
-
 # Work Type
 
 data %>% 
   group_by(work_type) %>% 
   summarise(Count = n(), avg_age = mean(age), stroke_percentage = round(mean(stroke), 3)) %>% 
-  arrange(desc(stroke_percentage))
-
-
+  arrange(desc(stroke_percentage)
 
 # Residence Type
 
 data %>% 
   group_by(Residence_type) %>% 
   summarise(Count = n(), "Percentage of Strokes" = round(mean(stroke), 3))
-
 
 # Average glucose level
 
@@ -156,9 +134,6 @@ g4 = ggplot(data , aes(y = avg_glucose_level, x = stroke, fill = as.factor(strok
   
 grid.arrange(g3, g4)
 
-
-
-
 # BMI
 
 g3 = ggplot( data , aes(x = bmi, fill = as.factor(stroke))) +
@@ -170,8 +145,6 @@ g4 = ggplot(data , aes(y = bmi, x = stroke, fill = as.factor(stroke))) +
   labs(y = "BMI", x = "Stroke") + theme_bw() + theme(legend.position = "none")
 
 grid.arrange(g3, g4)
-
-
 
 # Smoking Status
 
@@ -186,8 +159,6 @@ data %>%
     ggplot(aes(x = reorder(smoking_status, desc(Avg_stroke)), y = Avg_stroke, fill = as.factor(smoking_status))) + 
     geom_col() + geom_text(aes(label = count), vjust = 2, size = 5) + labs(x = "", y = "Percentage of Strokes") + theme_bw() + 
     theme(legend.position = "none") + theme(axis.title = element_text(face = 'bold'))
-
-
 
 # Ever_married & Age
 
@@ -204,24 +175,20 @@ married = ifelse(data$ever_married == "Yes", 1, 0)
 
 a = glm(married ~ age, data = data, family = binomial())
 
-
 #Finally, we decide not to include columns $residence_type, $gender and $ever_married
 
 
 
 ## Dealing with missing values
 
-
 # Remove bmi column
 
 data1 = data %>% select(-bmi)
-
-      
+    
 # Replace NAs with mean value
 
 data2 = data
 data2$bmi[is.na(data2$bmi)] = mean(data2$bmi, na.rm = T)
-
 
 # Replace NAs with linear regression estimation
 
@@ -239,14 +206,11 @@ ggplot(data3, aes(x = bmi, fill = bmi_na)) +
     scale_fill_manual(values = c("navyblue", "palegreen"), labels = c("Imputed Values", "Non-missing values")) +
     scale_x_continuous(breaks = seq(0,80,10)) + xlim(c(0,80))
   
-      
-
 # Replace NAs with K-Nearest Neighbors
 
 # first we need to normalize data
 
 normalize = function(x , na.rm = TRUE) { (x - min(x , na.rm = na.rm))/(max(x , na.rm = na.rm) - min(x , na.rm = na.rm)) }
-
 
 data_temp = data
 data_temp$hypertension = as.integer(data_temp$hypertension)
@@ -272,7 +236,6 @@ index = sample(1:nrow(train_knn), 0.7*nrow(train_knn), replace = F)
 training_set = train_knn[index,]
 validation_set = train_knn[-index,]
 
-
 val_mse = c()
 d = 1
 
@@ -288,7 +251,6 @@ qplot(x = 10:100, y = val_mse, geom = "line") + labs(x = "k", y =  "Validation M
 k = 10:100
 error = as.data.frame(cbind(k , val_mse))
 error[error$val_mse == min(error$val_mse),]
-
 
 #we find that validation error is minimum for k = 69. But we chose to use k = 40 to avoid underfitting
 
@@ -349,15 +311,12 @@ logical_index = (1:nrow(data_combined$data1) %in% index)
 training_list = lapply(data_combined, function(x) filter(x, logical_index))
 test_list = lapply(data_combined, function(x) filter(x, !logical_index))
 
-
 # applying Random Forest classification for data4
 
 rf = randomForest(stroke ~ ., data = training_list$data4, ntree = 1000, mtry = 3)
 
 preds_4 = predict(rf, newdata = test_list$data4, type = "prob") %>% as.data.frame()
-
-
-
+                   
 recall = c()
 precision = c()
 f1_score = c()
@@ -381,7 +340,7 @@ for (t in threshold){
   i = i + 1
 
 }
-
+                   
 ## Metrics plot
 
 data.frame(threshold, precision, recall, f1_score) %>% 
